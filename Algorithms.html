@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta name="generator" content="jemdoc, see http://jemdoc.jaboc.net/" />
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<link rel="stylesheet" href="jemdoc.css" type="text/css" />
+<title>Algorithms</title>
+</head>
+<body>
+<table summary="Table for page layout." id="tlayout">
+<tr valign="top">
+<td id="layout-menu">
+<div class="menu-item"><a href="RSC.html">Robust&nbsp;Subspace&nbsp;Clustering</a></div>
+<div class="menu-item"><a href="Algorithms.html" class="current">Algorithms</a></div>
+<div class="menu-item"><a href="Applications.html">Applications</a></div>
+<div class="menu-item"><a href="datacode.html">Data&nbsp;&amp;&nbsp;Code</a></div>
+</td>
+<td id="layout-content">
+<div id="toptitle">
+<h1>Algorithms</h1>
+</div>
+<p>Here we explain the setup and algorithm when the data points reside on linear subspaces, the algorithm can also cluster affine subspaces with simple modifications (see Section 2.2 of <a href="http://arxiv.org/abs/1301.2603">Robust Subspace Clustering</a> for further detail).</p>
+<h2>Setup and notation</h2>
+<p><img class="eq" src="eqs/9984030031-130.png" alt="N" style="vertical-align: -0px" /> points in <img class="eq" src="eqs/14080042351-130.png" alt="n" style="vertical-align: -1px" /> dimensions <img class="eq" src="eqs/65361908895111949-130.png" alt="mathbf{Y}=[y_1, y_2, ldots, y_N]" style="vertical-align: -5px" /> normalized to have unit Euclidean norm <img class="eq" src="eqs/6464530288353078121-130.png" alt="|y_l|_{ell_2}=1" style="vertical-align: -5px" />.</p>
+<h3>Noisy problem</h3>
+
+<div class="eqwl"><img class="eqwl" src="eqs/6955712470853957006-130.png" alt="mathbf{Y}=mathbf{X}+mathbf{Z}quadLeftrightarrowquad y_j=x_j+z_jquad" />
+<br /></div><ul>
+<li><p><img class="eq" src="eqs/4781585748424965538-130.png" alt="mathbf{X}" style="vertical-align: -0px" />: clean data points. Columns of <img class="eq" src="eqs/4781585748424965538-130.png" alt="mathbf{X}" style="vertical-align: -0px" /> belong to union of subspaces <img class="eq" src="eqs/8204220030234222212-130.png" alt="S_1cup S_2cupldotscup S_L" style="vertical-align: -3px" /> of unknown dimensions <img class="eq" src="eqs/1715199664293784697-130.png" alt="d_1, d_2, ldots, d_L" style="vertical-align: -4px" />.</p>
+</li>
+<li><p><img class="eq" src="eqs/4781585748426965548-130.png" alt="mathbf{Z}" style="vertical-align: -0px" />: noise. Each column has bounded norm <img class="eq" src="eqs/8796804413192733665-130.png" alt="|z_j|_{ell_2}lesigma" style="vertical-align: -6px" />.</p>
+</li>
+</ul>
+<table class="imgtable"><tr><td>
+<img src="noi.png" alt="" width="800px" height="300px" />&nbsp;</td>
+<td align="left"></td></tr></table>
+<h3>Missing data problem</h3>
+
+<div class="eqwl"><img class="eqwl" src="eqs/8637884432173519454-130.png" alt="mathbf{Y}=mathcal{P}_Omega(mathbf{X})" />
+<br /></div><ul>
+<li><p><img class="eq" src="eqs/4781585748424965538-130.png" alt="mathbf{X}" style="vertical-align: -0px" />: clean data points. Columns of <img class="eq" src="eqs/4781585748424965538-130.png" alt="mathbf{X}" style="vertical-align: -0px" /> belong to union of subspaces <img class="eq" src="eqs/8204220030234222212-130.png" alt="S_1cup S_2cupldotscup S_L" style="vertical-align: -3px" /> of unknown dimensions <img class="eq" src="eqs/1715199664293784697-130.png" alt="d_1, d_2, ldots, d_L" style="vertical-align: -4px" />.</p>
+</li>
+<li><p><img class="eq" src="eqs/6631946050023744508-130.png" alt="mathcal{P}_Omega" style="vertical-align: -3px" /> is an operator that zeros out each entry with probability <img class="eq" src="eqs/3780418731882909920-130.png" alt="delta" style="vertical-align: -1px" />.</p>
+</li>
+</ul>
+<table class="imgtable"><tr><td>
+<img src="miss.png" alt="" width="600px" height="250px" />&nbsp;</td>
+<td align="left"></td></tr></table>
+<h2>General Structure</h2>
+<p>The general structure of the algorithm follows the standard machine:</p>
+<ol>
+<li><p>Construct affinity matrix <img class="eq" src="eqs/4781585748415965453-130.png" alt="mathbf{W}" style="vertical-align: -1px" /> between samples producing a weighted graph.</p>
+</li>
+<li><p>Construct clusters by applying spectral clustering to <img class="eq" src="eqs/4781585748415965453-130.png" alt="mathbf{W}" style="vertical-align: -1px" />.</p>
+</li>
+<li><p>Apply PCA to each cluster.</p>
+</li>
+</ol>
+<p>Following Sparse Subspace Clustering (SSC) of Elhamifar and Vidal, we use ideas from sparse representation theory and sparse regression to compute affinities. </p>
+<p><b>Sparse regression</b></p>
+<p>We first, calculate a sparse coefficient sequence <img class="eq" src="eqs/3654431932962796131-130.png" alt="beta^{(i)}" style="vertical-align: -4px" /> obtained by regressing the <img class="eq" src="eqs/13440040424-130.png" alt="i" style="vertical-align: -1px" />th data point <img class="eq" src="eqs/7125508497047937994-130.png" alt="y_i" style="vertical-align: -4px" />  onto all other data points <img class="eq" src="eqs/8987050288076323691-130.png" alt="mathbf{Y}_{-i}" style="vertical-align: -4px" />. The hope is that such a sparse representation of <img class="eq" src="eqs/7125508497047937994-130.png" alt="y_i" style="vertical-align: -4px" /> would only select vectors from the cluster in which <img class="eq" src="eqs/7125508497047937994-130.png" alt="y_i" style="vertical-align: -4px" /> belongs to. This is depicted in the figure below with each color denoting points from a different cluster. </p>
+<p>We propose two strategies for the sparse regression step below.</p>
+<ul>
+<li><p>Two step procedure with data-driven regularization. </p>
+</li>
+<li><p>Bias-corrected Dantzig Selector.</p>
+</li>
+</ul>
+<table class="imgtable"><tr><td>
+<img src="SSC_onlyup2.png" alt="" width="400px" height="300px" />&nbsp;</td>
+<td align="left"></td></tr></table>
+<p><b>Building a graph based on the sparse coefficients</b></p>
+<p>We set</p>
+<p><img class="eq" src="eqs/7017525675797437966-130.png" alt="mathbf{W}_{ij}=|beta^{(i)}_j|+|beta^{(j)}_i|" style="vertical-align: -9px" /></p>
+<p>After applying a permutation which makes sure that columns in
+the same cluster are contiguous we expect the affinity matrix to look like the figure below where each block corresponds to a different cluster.</p>
+<table class="imgtable"><tr><td>
+<img src="sub_det.png" alt="" width="400px" height="400px" />&nbsp;</td>
+<td align="left"></td></tr></table>
+<h2>Two Step Procedure with Data Driven Regularization</h2>
+<p>For <img class="eq" src="eqs/4546430255957166583-130.png" alt="i=1,ldots,N" style="vertical-align: -4px" /> </p>
+<table class="imgtable"><tr><td>
+<img src="RSC_LASSO.png" alt="" width="550px" height="50px" />&nbsp;</td>
+<td align="left"></td></tr></table>
+<p>We choose <img class="eq" src="eqs/2768874965527882936-130.png" alt="lambda_i" style="vertical-align: -4px" /> in a data driven fashion:</p>
+<table class="imgtable"><tr><td>
+<img src="datadriven.png" alt="" width="650px" height="200px" />&nbsp;</td>
+<td align="left"></td></tr></table>
+<p><b>Choice of parameters:</b> <img class="eq" src="eqs/5899308143749580790-130.png" alt="tau=2sigma, f(t)=1/(4t)" style="vertical-align: -5px" />.</p>
+<h2>Bias-corrected Dantzig Selector</h2>
+<p>Again regress one against the others this time by Dantzig Selector. </p>
+<p><img class="eq" src="eqs/7956997823703657294-130.png" alt="beta^{(i)}=argmin |beta|_{ell_1}" style="vertical-align: -5px" /> subject to <img class="eq" src="eqs/7706088632463926422-130.png" alt="|gamma^{(i)}-mathbf{Gamma}^{(i)}beta)|_{infty}lelambda" style="vertical-align: -5px" />.</p>
+<p><img class="eq" src="eqs/7259731552943229186-130.png" alt="gamma^{(i)}=mathbf{X}_{-i}^Tx_i" style="vertical-align: -6px" /> and <img class="eq" src="eqs/8057659241329273448-130.png" alt="mathbf{Gamma}^{(-i)}=mathbf{X}_{-i}^Tmathbf{X}_{-i}" style="vertical-align: -6px" />.</p>
+<p>In practice we only get to observe the noisy versions <img class="eq" src="eqs/7125508497047937994-130.png" alt="y_i" style="vertical-align: -4px" /> and <img class="eq" src="eqs/8987050288076323691-130.png" alt="mathbf{Y}_{-i}" style="vertical-align: -4px" />. </p>
+<p>Solution: Build unbiased estimators for <img class="eq" src="eqs/6745217695348113639-130.png" alt="gamma^{(i)}" style="vertical-align: -4px" /> and <img class="eq" src="eqs/7727381392898361088-130.png" alt="mathbf{Gamma}^{(i)}" style="vertical-align: -0px" />. Set </p>
+
+<div class="eqwl"><img class="eqwl" src="eqs/8024975097151847834-130.png" alt=" hat{gamma}^{(i)}=mathbf{Y}_{-i}^Ty_i,quadhat{mathbf{Gamma}}^{(i)}=mathbf{Y}_{-i}^Tmathbf{Y}_{-i}-sigma^2mathbf{I}. " />
+<br /></div><p>Finally, we arrive at at the following sequence of optimization problems.</p>
+<p><img class="eq" src="eqs/7956997823703657294-130.png" alt="beta^{(i)}=argmin |beta|_{ell_1}" style="vertical-align: -5px" /> subject to <img class="eq" src="eqs/5195194718220933992-130.png" alt="|hat{gamma}^{(i)}-hat{mathbf{Gamma}}^{(-i)}beta)|_{infty}lelambda" style="vertical-align: -5px" />.</p>
+<p><b>Choice of parameters:</b> <img class="eq" src="eqs/5747504663608339280-130.png" alt="lambda=sqrt{32/n}sigmasqrt{1+sigma^2}" style="vertical-align: -6px" />.</p>
+<h2>Bias-corrected Dantzig Selector for missing data</h2>
+<p><img class="eq" src="eqs/2613824260271184293-130.png" alt="Omega_isubset{1,2,ldots,n}" style="vertical-align: -5px" /> denotes the observations from the <img class="eq" src="eqs/13440040424-130.png" alt="i" style="vertical-align: -1px" />-th column of the clean data matrix <img class="eq" src="eqs/4781585748424965538-130.png" alt="mathbf{X}" style="vertical-align: -0px" /> </p>
+<p><img class="eq" src="eqs/2745429148883606549-130.png" alt="mathbf{X}_{Omega_i}" style="vertical-align: -6px" /> denotes the submatrix of <img class="eq" src="eqs/4781585748424965538-130.png" alt="mathbf{X}" style="vertical-align: -0px" /> with rows selected by <img class="eq" src="eqs/1193801286802568263-130.png" alt="Omega_i" style="vertical-align: -4px" />. </p>
+<p>Again regress one against the others this time by Dantzig Selector. </p>
+<p><img class="eq" src="eqs/7956997823703657294-130.png" alt="beta^{(i)}=argmin |beta|_{ell_1}" style="vertical-align: -5px" /> subject to <img class="eq" src="eqs/7706088632463926422-130.png" alt="|gamma^{(i)}-mathbf{Gamma}^{(i)}beta)|_{infty}lelambda" style="vertical-align: -5px" />.</p>
+<p><img class="eq" src="eqs/659608602783955052-130.png" alt="gamma^{(i)}=mathbf{X}_{Omega_i}^Tx_{Omega_i}" style="vertical-align: -8px" /> and <img class="eq" src="eqs/5260481118776190470-130.png" alt="mathbf{Gamma}^{(-i)}=mathbf{X}_{Omega_i}^Tmathbf{X}_{Omega_i}" style="vertical-align: -8px" />.</p>
+<p>In practice we only get to observe a few entries.</p>
+<p>Solution: Again build unbiased estimators for <img class="eq" src="eqs/6745217695348113639-130.png" alt="gamma^{(i)}" style="vertical-align: -4px" /> and <img class="eq" src="eqs/2114891249924131129-130.png" alt="Gamma^{(i)}" style="vertical-align: -0px" />. Set</p>
+<p>We build a matrix <img class="eq" src="eqs/4781585748425965679-130.png" alt="mathbf{Y}" style="vertical-align: -0px" /> based on the observed entries of <img class="eq" src="eqs/4781585748424965538-130.png" alt="mathbf{X}" style="vertical-align: -0px" /> as follows. Set <img class="eq" src="eqs/6218684615957215062-130.png" alt="Y_{ij}= frac{X_{ij}}{(1-delta)}" style="vertical-align: -11px" /> if observed and <img class="eq" src="eqs/9169670096138140177-130.png" alt="Y_{ij}= 0" style="vertical-align: -6px" /> if missing.</p>
+<p>Set <img class="eq" src="eqs/1285785115038967150-130.png" alt="hat{mathbf{Gamma}}^{(i)}=mathbf{Y}_{Omega_i}^Tmathbf{Y}_{Omega_i}-delta diag(mathbf{Y}_{Omega_i}^Tmathbf{Y}_{Omega_i})" style="vertical-align: -8px" /> with the <img class="eq" src="eqs/13440040424-130.png" alt="i" style="vertical-align: -1px" />th row and column set to zero. </p>
+<p>Set <img class="eq" src="eqs/6286539937808987655-130.png" alt="hat{gamma}^{(i)}=mathbf{Y}_{Omega_i}^Ty_{Omega_i}^{(i)}" style="vertical-align: -9px" /> with the <img class="eq" src="eqs/13440040424-130.png" alt="i" style="vertical-align: -1px" />th row set to zero. </p>
+<p>Finally, we arrive at</p>
+<p><img class="eq" src="eqs/7956997823703657294-130.png" alt="beta^{(i)}=argmin |beta|_{ell_1}" style="vertical-align: -5px" /> subject to <img class="eq" src="eqs/5195194718220933992-130.png" alt="|hat{gamma}^{(i)}-hat{mathbf{Gamma}}^{(-i)}beta)|_{infty}lelambda" style="vertical-align: -5px" />.</p>
+<p><b>Choice of parameters:</b> <img class="eq" src="eqs/805931929879273605-130.png" alt="lambda=sqrt{frac{2log N}{n}}frac{bar{delta}}{1-bar{delta}}" style="vertical-align: -16px" />, where <img class="eq" src="eqs/8259019651990354505-130.png" alt="bar{delta}=" style="vertical-align: -1px" />number of missing entries/total number of entries.</p>
+<div id="footer">
+<div id="footer-text">
+Page generated 2013-09-17 13:46:36 PDT, by <a href="http://jemdoc.jaboc.net/">jemdoc</a>.
+</div>
+</div>
+</td>
+</tr>
+</table>
+</body>
+</html>
