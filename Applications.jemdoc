@@ -1,0 +1,106 @@
+# jemdoc: menu{menu_hp}{Applications.html}
+= Applications
+
+*Note:* This site is still under construction and will be updated with more applications in the near future. 
+
+
+== Temporal Segmentation of Motion Capture Data
+
+In this application we are given
+sensor measurements at multiple joints of the human body captured at different time instants. The goal is to segment the sensory data so that each cluster corresponds to the same activity. Here, each data point corresponds to a vector whose elements are the sensor measurements of different joints at a fixed time instant. 
+
+We use the Carnegie Mellon Motion Capture dataset which contains 149 subjects performing several activities (more specifically subject 86 trials 2 and 5). The video below shows the subject performing different activities.
+
+
+{{
+<video width="500" height="380" controls="controls">
+  <source src="subject.mp4" type="video/mp4" />
+  <source src="subject.ogg" type="video/ogg">
+</video>
+}}
+ 
+
+The figures below show a few snapshots of each
+activity (walking, squatting, punching, standing, running, jumping, arms-up, and drinking). The right plot shows the singular values of three of the activities in this trial. Notice that all the curves have a low-dimensional knee, showing that the data from each activity lie in a low-dimensional subspace of the ambient space.
+
+~~~
+{}{img_left}{figs.png}{}{800}{200}{}
+~~~
+
+=== KNN with Gaussian kernel: a baseline for comparison
+
+As a baseline for comparison, we apply spectral clustering to a standard similarity graph built by connecting each data point to its K-nearest neighbors. For pairs of data points, $y_i$ and $y_j$,that are connected in the K-nearest neighbor graph, we define the similarities between them by $W_{ij} = exp(−\|y_i-y_j\|_{\ell_2}^2/t)$, where $t > 0$ is a tuning parameter. For pairs of data points, $y_i$ and $y_j$, that are not connected in the K-nearest neighbor graph, we set $W_{ij}=0$. We then apply spectral clustering to the similarity graph and measure the clustering error. We record the minimum value of the clustering error over different choices of $K$ and $t$.
+
+=== Summary of Results
+
+A summary of the clustering errors on the two trials are reported below. Table 1 reports the optimal parameters that achieve the minimum clustering error for each algorithm.
+
+~~~
+{}{img_left}{comparenew.png}{}{600}{400}{}
+~~~
+
+Minimum clustering error (%) for KNN and two variation of robust SSC: Bias corrected Dantzig selector (RSC-1), and Two step procedure (RSC-2).
+
+~~~
+{}{img_left}{table.png}{}{800}{120}{}
+~~~
+
+== Cancer Data with missing entries
+
+We use the data set in preprocessed form from the MIT Broad Institute which contains various gene expression data sets. In each data set different categories correspond to different tumor or tissue types relating to different cancers. We tested our results on four data sets: Leukemia, St. Jude leukemia, Lung cancer and Novartis multi-tissue. A summary of the data is provided in Table 1 below. 
+
+~~~
+{}{img_left}{cancer.png}{}{600}{120}{}
+~~~
+
+A comparison of our algorithm when there are no missing data appears in Table 2 below.
+
+~~~
+{}{img_left}{clustcancer.png}{}{600}{120}{}
+~~~
+
+Heat map plot of the gene expression level of the different groups of patients in the St. Jude Leukemia data set is depicted in the figure below.
+~~~
+{}{img_left}{visualizegrps.png}{}{1000}{400}{}
+~~~
+
+Clustering error (%) for different cancer data examples and different fractions of missing entries $\delta$.
+
+(a) Leukemia
+~~~
+{}{img_left}{1.png}{}{800}{200}{}
+~~~
+
+(b) St. Jude Leukemia
+~~~
+{}{img_left}{2.png}{}{800}{200}{}
+~~~
+
+(c) Lung cancer
+~~~
+{}{img_left}{3.png}{}{800}{200}{}
+~~~
+
+(d) Novartis multi-tissue
+~~~
+{}{img_left}{4.png}{}{800}{200}{}
+~~~
+
+== NUS animal data set
+
+Here we are interested in clustering animal images based on type. Sample images appear below.
+
+~~~
+{}{img_left}{animals.png}{}{1000}{500}{}
+~~~
+
+We apply a subspace clustering type algorithm to this data. (Warning: We are not claiming that this example is a valid subspace clustering problem. This is just for fun! and to show the self representation idea is useful in other contexts) 
+We regress each column agains all others using
+
+$\beta^{(i)}=\arg\min\|y-\mathbf{Y}\beta\|_{\ell_1}+\lambda\|\beta\|_{\ell_1}$ subject to $1^T\beta=1$
+
+We then build the graph and apply spectral clustering as before. The results appear below
+
+~~~
+{}{img_left}{clusterrs.png}{}{800}{300}{}
+~~~

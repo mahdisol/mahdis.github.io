@@ -1,0 +1,44 @@
+# jemdoc: menu{menu_hp}{Algorithms.html} 
+# jemdoc: addpackage{amsfonts}
+= Algorithms
+
+== Model
+
+$N$ points in $n$ dimensions collected as columns of a matrix $\mathbf{Y}=[\mathbf{y}_1, \mathbf{y}_2,\ldots,\mathbf{y}_N]$.
+\(
+\mathbf{Y}=\mathbf{X}+\mathbf{Z}\quad\Leftrightarrow\quad\mathbf{y}_j=\mathbf{x}_j+\mathbf{z}_j
+\)
+- $\mathbf{X}$ contains the ``clean" data points with columns belonging to the union of unknown subspaces $S_1,S_2,\ldots,S_L$ of unknown dimensions $d_1,d_2,\ldots,d_L$.
+- $\mathbf{Z}$ contains the added noise with columns satisfying $\|\mathbf{z}_j\|\le\sigma$.
+
+
+== General Structure
+
+The general structure of the algorithm is a natural extension of Sparse Subspace Clustering (SSC) as shown in Algorithm 1. The key part of the algorithm is how to regress each column against the rest (Step 1). In what follows we present two alternatives for this regression step:
+- Two step procedure with data-driven regularization. 
+- Bias-corrected Dantzig Selector.
+~~~
+{}{img_left}{general.png}{}{900}{400}{}
+~~~
+
+== Two Step Procedure with Data Driven Regularization
+
+for $i=1,\ldots,N$ do
+. Solve \n
+	$\beta^*=\arg\min\, \|\beta\|_{\ell_1}$ subject  to $\|\mathbf{y}_i-\mathbf{Y}\beta\|_{\ell_2}\le \tau$ and $\beta_i=0.$
+. Set $\lambda=f(\|\beta^*\|_{\ell_1})$.
+. Solve  \n
+$\hat{\beta}=\arg\min \frac{1}{2}\|\mathbf{y}_i-\mathbf{Y}\beta\|_{\ell_2}^2+\lambda\|\beta\|_{\ell_1}$.
+. Set $\mathbf{B}_i=\hat{\beta}$.
+
+end for
+
+*Choice of parameters:* $\tau=2\sigma, f(t)=1/(4t)$.
+== Bias-corrected Dantzig Selector
+for $i=1,\ldots,N$ do
+
+	$\min \|\beta\|_{\ell_1}$ subject to $\|\mathbf{Y}_{(-i)}^T(\mathbf{y}_i-\mathbf{Y}\beta)\|_{\infty}\le\lambda$ and $\beta_i=0$.
+
+end for
+
+*Choice of parameters:* $\lambda=\sqrt{32/n}\sigma\sqrt{1+\sigma^2}$.

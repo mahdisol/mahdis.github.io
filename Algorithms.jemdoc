@@ -1,0 +1,136 @@
+# jemdoc: menu{menu_hp}{Algorithms.html} 
+# jemdoc: addpackage{amsfonts}
+= Algorithms
+
+Here we explain the setup and algorithm when the data points reside on linear subspaces, the algorithm can also cluster affine subspaces with simple modifications (see Section 2.2 of [http://arxiv.org/abs/1301.2603 Robust Subspace Clustering] for further detail).
+
+== Setup and notation
+
+$N$ points in $n$ dimensions $\mathbf{Y}=[y_1, y_2, \ldots, y_N]$ normalized to have unit Euclidean norm $\|y_l\|_{\ell_2}=1$.
+
+=== Noisy problem
+
+\(\mathbf{Y}=\mathbf{X}+\mathbf{Z}\quad\Leftrightarrow\quad y_j=x_j+z_j\quad\)
+
+- $\mathbf{X}$: clean data points. Columns of $\mathbf{X}$ belong to union of subspaces $S_1\cup S_2\cup\ldots\cup S_L$ of unknown dimensions $d_1, d_2, \ldots, d_L$.
+- $\mathbf{Z}$: noise. Each column has bounded norm $\|z_j\|_{\ell_2}\le\sigma$.
+
+~~~
+{}{img_left}{noi.png}{}{800}{300}{}
+~~~
+
+=== Missing data problem
+
+\(\mathbf{Y}=\mathcal{P}_\Omega(\mathbf{X})\)
+
+- - $\mathbf{X}$: clean data points. Columns of $\mathbf{X}$ belong to union of subspaces $S_1\cup S_2\cup\ldots\cup S_L$ of unknown dimensions $d_1, d_2, \ldots, d_L$.
+- $\mathcal{P}_\Omega$ is an operator that zeros out each entry with probability $\delta$.
+
+
+
+
+~~~
+{}{img_left}{miss.png}{}{600}{250}{}
+~~~
+
+== General Structure
+The general structure of the algorithm follows the standard machine:
+
+. Construct affinity matrix $\mathbf{W}$ between samples producing a weighted graph.
+. Construct clusters by applying spectral clustering to $\mathbf{W}$.
+. Apply PCA to each cluster.
+
+Following Sparse Subspace Clustering (SSC) of Elhamifar and Vidal, we use ideas from sparse representation theory and sparse regression to compute affinities. 
+
+*Sparse regression*
+
+We first, calculate a sparse coefficient sequence $\beta^{(i)}$ obtained by regressing the $i$th data point $y_i$  onto all other data points $\mathbf{Y}_{-i}$. The hope is that such a sparse representation of $y_i$ would only select vectors from the cluster in which $y_i$ belongs to. This is depicted in the figure below with each color denoting points from a different cluster. 
+
+
+We propose two strategies for the sparse regression step below.
+
+- Two step procedure with data-driven regularization. 
+- Bias-corrected Dantzig Selector.
+
+~~~
+{}{img_left}{SSC_onlyup2.png}{}{400}{300}{}
+~~~
+
+*Building a graph based on the sparse coefficients*
+
+We set
+
+$\mathbf{W}_{ij}=|\beta^{(i)}_j|+|\beta^{(j)}_i|$
+
+After applying a permutation which makes sure that columns in
+the same cluster are contiguous we expect the affinity matrix to look like the figure below where each block corresponds to a different cluster.
+~~~
+{}{img_left}{sub_det.png}{}{400}{400}{}
+~~~
+
+
+== Two Step Procedure with Data Driven Regularization
+
+For $i=1,\ldots,N$ 
+
+~~~
+{}{img_left}{RSC_LASSO.png}{}{550}{50}{}
+~~~
+
+We choose $\lambda_i$ in a data driven fashion:
+
+~~~
+{}{img_left}{datadriven.png}{}{650}{200}{}
+~~~
+
+*Choice of parameters:* $\tau=2\sigma, f(t)=1/(4t)$.
+== Bias-corrected Dantzig Selector
+
+Again regress one against the others this time by Dantzig Selector. 
+
+$\beta^{(i)}=\arg\min \|\beta\|_{\ell_1}$ subject to $\|\gamma^{(i)}-\mathbf{\Gamma}^{(i)}\beta)\|_{\infty}\le\lambda$.
+
+$\gamma^{(i)}=\mathbf{X}_{-i}^Tx_i$ and $\mathbf{\Gamma}^{(-i)}=\mathbf{X}_{-i}^T\mathbf{X}_{-i}$.
+
+In practice we only get to observe the noisy versions $y_i$ and $\mathbf{Y}_{-i}$. 
+
+Solution: Build unbiased estimators for $\gamma^{(i)}$ and $\mathbf{\Gamma}^{(i)}$. Set 
+\(
+\hat{\gamma}^{(i)}=\mathbf{Y}_{-i}^Ty_i,\quad\hat{\mathbf{\Gamma}}^{(i)}=\mathbf{Y}_{-i}^T\mathbf{Y}_{-i}-\sigma^2\mathbf{I}.
+\)
+ 
+Finally, we arrive at at the following sequence of optimization problems.
+
+	$\beta^{(i)}=\arg\min \|\beta\|_{\ell_1}$ subject to $\|\hat{\gamma}^{(i)}-\hat{\mathbf{\Gamma}}^{(-i)}\beta)\|_{\infty}\le\lambda$.
+
+*Choice of parameters:* $\lambda=\sqrt{32/n}\sigma\sqrt{1+\sigma^2}$.
+
+== Bias-corrected Dantzig Selector for missing data
+
+
+$\Omega_i\subset\{1,2,\ldots,n\}$ denotes the observations from the $i$-th column of the clean data matrix $\mathbf{X}$ 
+
+$\mathbf{X}_{\Omega_i}$ denotes the submatrix of $\mathbf{X}$ with rows selected by $\Omega_i$. 
+
+Again regress one against the others this time by Dantzig Selector. 
+
+$\beta^{(i)}=\arg\min \|\beta\|_{\ell_1}$ subject to $\|\gamma^{(i)}-\mathbf{\Gamma}^{(i)}\beta)\|_{\infty}\le\lambda$.
+
+$\gamma^{(i)}=\mathbf{X}_{\Omega_i}^Tx_{\Omega_i}$ and $\mathbf{\Gamma}^{(-i)}=\mathbf{X}_{\Omega_i}^T\mathbf{X}_{\Omega_i}$.
+
+In practice we only get to observe a few entries.
+
+Solution: Again build unbiased estimators for $\gamma^{(i)}$ and $\Gamma^{(i)}$. Set
+
+ We build a matrix $\mathbf{Y}$ based on the observed entries of $\mathbf{X}$ as follows. Set $Y_{ij}= \frac{X_{ij}}{(1-\delta)}$ if observed and $Y_{ij}= 0$ if missing.
+
+Set $\hat{\mathbf{\Gamma}}^{(i)}=\mathbf{Y}_{\Omega_i}^T\mathbf{Y}_{\Omega_i}-\delta diag(\mathbf{Y}_{\Omega_i}^T\mathbf{Y}_{\Omega_i})$ with the $i$th row and column set to zero. 
+
+Set $\hat{\gamma}^{(i)}=\mathbf{Y}_{\Omega_i}^Ty_{\Omega_i}^{(i)}$ with the $i$th row set to zero. 
+
+Finally, we arrive at
+
+$\beta^{(i)}=\arg\min \|\beta\|_{\ell_1}$ subject to $\|\hat{\gamma}^{(i)}-\hat{\mathbf{\Gamma}}^{(-i)}\beta)\|_{\infty}\le\lambda$.
+
+
+*Choice of parameters:* $\lambda=\sqrt{\frac{2\log N}{n}}\frac{\bar{\delta}}{1-\bar{\delta}}$, where $\bar{\delta}=$number of missing entries/total number of entries.

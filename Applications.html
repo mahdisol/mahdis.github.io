@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta name="generator" content="jemdoc, see http://jemdoc.jaboc.net/" />
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<link rel="stylesheet" href="jemdoc.css" type="text/css" />
+<title>Applications</title>
+</head>
+<body>
+<table summary="Table for page layout." id="tlayout">
+<tr valign="top">
+<td id="layout-menu">
+<div class="menu-item"><a href="RSC.html">Robust&nbsp;Subspace&nbsp;Clustering</a></div>
+<div class="menu-item"><a href="Algorithms.html">Algorithms</a></div>
+<div class="menu-item"><a href="Applications.html" class="current">Applications</a></div>
+<div class="menu-item"><a href="datacode.html">Data&nbsp;&amp;&nbsp;Code</a></div>
+</td>
+<td id="layout-content">
+<div id="toptitle">
+<h1>Applications</h1>
+</div>
+<p><b>Note:</b> This site is still under construction and will be updated with more applications in the near future. </p>
+<h2>Temporal Segmentation of Motion Capture Data</h2>
+<p>In this application we are given
+sensor measurements at multiple joints of the human body captured at different time instants. The goal is to segment the sensory data so that each cluster corresponds to the same activity. Here, each data point corresponds to a vector whose elements are the sensor measurements of different joints at a fixed time instant. </p>
+<p>We use the Carnegie Mellon Motion Capture dataset which contains 149 subjects performing several activities (more specifically subject 86 trials 2 and 5). The video below shows the subject performing different activities.</p>
+<p>
+<video width="500" height="380" controls="controls">
+<source src="subject.mp4" type="video/mp4" />
+<source src="subject.ogg" type="video/ogg">
+</video>
+</p>
+<p>The figures below show a few snapshots of each
+activity (walking, squatting, punching, standing, running, jumping, arms-up, and drinking). The right plot shows the singular values of three of the activities in this trial. Notice that all the curves have a low-dimensional knee, showing that the data from each activity lie in a low-dimensional subspace of the ambient space.</p>
+<table class="imgtable"><tr><td>
+<img src="figs.png" alt="" width="800px" height="200px" />&nbsp;</td>
+<td align="left"></td></tr></table>
+<h3>KNN with Gaussian kernel: a baseline for comparison</h3>
+<p>As a baseline for comparison, we apply spectral clustering to a standard similarity graph built by connecting each data point to its K-nearest neighbors. For pairs of data points, <img class="eq" src="eqs/7125508497047937994-130.png" alt="y_i" style="vertical-align: -4px" /> and <img class="eq" src="eqs/7125508497047937995-130.png" alt="y_j" style="vertical-align: -6px" />,that are connected in the K-nearest neighbor graph, we define the similarities between them by <img class="eq" src="eqs/5635518131694700045-130.png" alt="W_{ij} = exp(−|y_i-y_j|_{ell_2}^2/t)" style="vertical-align: -7px" />, where <img class="eq" src="eqs/6567618269581498831-130.png" alt="t &gt; 0" style="vertical-align: -1px" /> is a tuning parameter. For pairs of data points, <img class="eq" src="eqs/7125508497047937994-130.png" alt="y_i" style="vertical-align: -4px" /> and <img class="eq" src="eqs/7125508497047937995-130.png" alt="y_j" style="vertical-align: -6px" />, that are not connected in the K-nearest neighbor graph, we set <img class="eq" src="eqs/4893229380740102798-130.png" alt="W_{ij}=0" style="vertical-align: -6px" />. We then apply spectral clustering to the similarity graph and measure the clustering error. We record the minimum value of the clustering error over different choices of <img class="eq" src="eqs/9600028874-130.png" alt="K" style="vertical-align: -0px" /> and <img class="eq" src="eqs/14848044661-130.png" alt="t" style="vertical-align: -1px" />.</p>
+<h3>Summary of Results</h3>
+<p>A summary of the clustering errors on the two trials are reported below. Table 1 reports the optimal parameters that achieve the minimum clustering error for each algorithm.</p>
+<table class="imgtable"><tr><td>
+<img src="comparenew.png" alt="" width="600px" height="400px" />&nbsp;</td>
+<td align="left"></td></tr></table>
+<p>Minimum clustering error (%) for KNN and two variation of robust SSC: Bias corrected Dantzig selector (RSC-1), and Two step procedure (RSC-2).</p>
+<table class="imgtable"><tr><td>
+<img src="table.png" alt="" width="800px" height="120px" />&nbsp;</td>
+<td align="left"></td></tr></table>
+<h2>Cancer Data with missing entries</h2>
+<p>We use the data set in preprocessed form from the MIT Broad Institute which contains various gene expression data sets. In each data set different categories correspond to different tumor or tissue types relating to different cancers. We tested our results on four data sets: Leukemia, St. Jude leukemia, Lung cancer and Novartis multi-tissue. A summary of the data is provided in Table 1 below. </p>
+<table class="imgtable"><tr><td>
+<img src="cancer.png" alt="" width="600px" height="120px" />&nbsp;</td>
+<td align="left"></td></tr></table>
+<p>A comparison of our algorithm when there are no missing data appears in Table 2 below.</p>
+<table class="imgtable"><tr><td>
+<img src="clustcancer.png" alt="" width="600px" height="120px" />&nbsp;</td>
+<td align="left"></td></tr></table>
+<p>Heat map plot of the gene expression level of the different groups of patients in the St. Jude Leukemia data set is depicted in the figure below.</p>
+<table class="imgtable"><tr><td>
+<img src="visualizegrps.png" alt="" width="1000px" height="400px" />&nbsp;</td>
+<td align="left"></td></tr></table>
+<p>Clustering error (%) for different cancer data examples and different fractions of missing entries <img class="eq" src="eqs/3780418731882909920-130.png" alt="delta" style="vertical-align: -1px" />.</p>
+<p>(a) Leukemia</p>
+<table class="imgtable"><tr><td>
+<img src="1.png" alt="" width="800px" height="200px" />&nbsp;</td>
+<td align="left"></td></tr></table>
+<p>(b) St. Jude Leukemia</p>
+<table class="imgtable"><tr><td>
+<img src="2.png" alt="" width="800px" height="200px" />&nbsp;</td>
+<td align="left"></td></tr></table>
+<p>(c) Lung cancer</p>
+<table class="imgtable"><tr><td>
+<img src="3.png" alt="" width="800px" height="200px" />&nbsp;</td>
+<td align="left"></td></tr></table>
+<p>(d) Novartis multi-tissue</p>
+<table class="imgtable"><tr><td>
+<img src="4.png" alt="" width="800px" height="200px" />&nbsp;</td>
+<td align="left"></td></tr></table>
+<h2>NUS animal data set</h2>
+<p>Here we are interested in clustering animal images based on type. Sample images appear below.</p>
+<table class="imgtable"><tr><td>
+<img src="animals.png" alt="" width="1000px" height="500px" />&nbsp;</td>
+<td align="left"></td></tr></table>
+<p>We apply a subspace clustering type algorithm to this data. (Warning: We are not claiming that this example is a valid subspace clustering problem. This is just for fun! and to show the self representation idea is useful in other contexts) 
+We regress each column agains all others using</p>
+<p><img class="eq" src="eqs/5247572090016745912-130.png" alt="beta^{(i)}=argmin|y-mathbf{Y}beta|_{ell_1}+lambda|beta|_{ell_1}" style="vertical-align: -5px" /> subject to <img class="eq" src="eqs/9212553624257187411-130.png" alt="1^Tbeta=1" style="vertical-align: -4px" /></p>
+<p>We then build the graph and apply spectral clustering as before. The results appear below</p>
+<table class="imgtable"><tr><td>
+<img src="clusterrs.png" alt="" width="800px" height="300px" />&nbsp;</td>
+<td align="left"></td></tr></table>
+<div id="footer">
+<div id="footer-text">
+Page generated 2013-10-22 07:37:24 PDT, by <a href="http://jemdoc.jaboc.net/">jemdoc</a>.
+</div>
+</div>
+</td>
+</tr>
+</table>
+</body>
+</html>
