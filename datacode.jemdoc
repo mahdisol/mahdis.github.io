@@ -1,0 +1,85 @@
+# jemdoc: menu{menu_hp}{datacode.html}
+= Data & Code
+
+*Note:* this site is still under construction. In the near future we will provide the Matlab scripts that generate the figures and tables in the [http://arxiv.org/abs/1301.2603 Robust Subspace Clustering] paper along with the /source data/ required to run them. For now we have provided the code for the various solvers used in the paper.
+
+== Code
+
+*General guidelines:* The LASSO based solvers provided here use [http://cvxr.com/tfocs/ TFOCS]. After downloading and saving the TFOCS path, please replace TFOCS's prox_l1.m with [matlab/prox_l1.m prox_l1.m]. The Dantzig based solvers use [http://users.ece.gatech.edu/~sasif/homotopy/index.html L1 Homotopy methods] tool box. The comparison files use [http://cvxr.com/cvx/ CVX]. Please make sure to have these toolboxes installed/added to your Matlab path.
+
+=== Complete Package
+
+You can download all of the M-files provided on this webpage as a single zip file: [RSC.zip RSC.zip].
+
+=== Matlab solvers
+
+==== LASSO based solvers
+
+. *RSC*: \n
+Uses LASSO to simultaneously regress each column against all others with a single choice of $\lambda$ for all data points.
+	.. solver: [matlab/solver_RSC.m solver_RSC.m].
+	.. comparison with CVX: [matlab/run_RSC.m run_RSC.m].
+. *partial RSC*:  \n
+Uses LASSO to regress each column against all others with a single choice of $\lambda$ for all data points. This process is carried out simultaneously over a partial subset of the data points.
+	.. solver: [matlab/solver_RSC_partial.m solver_RSC_partial.m].
+	.. comparison with CVX: [matlab/run_RSC_partial.m run_RSC_partial.m].
+. *multi-RSC*: \n
+Uses LASSO to simultaneously regress each column against all others with a different choice of $\lambda$ for each of the data points.
+	.. solver: [matlab/solver_multi_RSC.m solver_multi_RSC.m].
+	.. comparison with CVX: [matlab/run_multi_RSC.m run_multi_RSC.m].
+. *partial multi-RSC*: \n
+Uses LASSO to regress each column against all others with a different choice of $\lambda$ for each of the data points. This process is carried out simultaneously over a partial subset of the data points.
+	.. solver: [matlab/solver_multi_RSC_partial.m solver_multi_RSC_partial.m].
+	.. comparison with CVX: [matlab/run_multi_RSC_partial.m run_multi_RSC_partial.m].
+. *constrained RSC*: \n
+Uses the constrained version of LASSO to simultaneously regress each column against all others with a single choice of $\tau$ for each of the data points.
+	.. solver: [matlab/solver_constr_RSC.m solver_constr_RSC.m].
+	.. comparison with CVX: [matlab/run_constr_RSC.m run_constr_RSC.m].
+. *partial constrained RSC*: \n
+Uses the constrained version of LASSO to regress each column against all others with a single choice of $\tau$ for each of the data points. This process is carried out simultaneously over a partial subset of the data points.
+	.. solver: [matlab/solver_constr_RSC_partial.m solver_constr_RSC_partial.m].
+	.. comparison with CVX: [matlab/run_constr_RSC_partial.m run_constr_RSC_partial.m].
+
+==== Dantzig based solvers
+
+. *Bias-corrected Dantzig:* \n
+Solves the bias-corrected Dantzig formulation for each data point.
+	.. solver: [matlab/solver_BCDantzig.m solver_BCDantzig.m]
+	.. comparison with CVX: [matlab/run_BCDantzig.m run_BCDantzig.m]
+. *Bias-corrected Dantzig with multiple parameters:* \n
+Solves the bias-corrected Dantzig formulation for each data point using multiple values of the parameter $\lambda$.
+	.. solver: [matlab/solver_BCDantzig_all.m solver_BCDantzig_all.m]
+	.. comparison with CVX: [matlab/run_BCDantzig_all.m run_BCDantzig_all.m]
+
+=== Matlab functions
+
+==== op functions
+These functions build the linear operators needed to simultaneously run all the regression problems in parallel for each of the solvers.
+- [matlab/RSC_op.m RSC_op.m]
+- [matlab/RSC_op_partial.m RSC_op_partial.m]
+==== prox functions
+- [matlab/prox_col_l2.m prox_col_l2.m]: builds prox function for $\ell_2/\ell_{\infty}$ norm of a matrix. 
+- [matlab/tfocs_prox.m tfocs_prox.m]: builds prox functions (provided in [http://cvxr.com/tfocs/ TFOCS]).
+- [matlab/prox_l1.m prox_l1.m]: builds the prox of $\ell_1$ norm (modified version of prox_l1.m provided in [http://cvxr.com/tfocs/ TFOCS]).
+
+==== spectral clustering functions
+- [matlab/BuildAdjacency.m BuildAdjacency.m].
+- [matlab/Misclassification.m Misclassification.m].
+- [matlab/missclassGroups.m missclassGroups.m].
+- [matlab/SpectralClustering.m SpectralClustering.m].
+
+
+=== Matlab scripts
+
+- coming soon!
+
+== Data
+
+- coming soon!
+
+
+
+
+
+
+

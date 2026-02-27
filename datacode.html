@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta name="generator" content="jemdoc, see http://jemdoc.jaboc.net/" />
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<link rel="stylesheet" href="jemdoc.css" type="text/css" />
+<title>Data &amp; Code</title>
+</head>
+<body>
+<table summary="Table for page layout." id="tlayout">
+<tr valign="top">
+<td id="layout-menu">
+<div class="menu-item"><a href="RSC.html">Robust&nbsp;Subspace&nbsp;Clustering</a></div>
+<div class="menu-item"><a href="Algorithms.html">Algorithms</a></div>
+<div class="menu-item"><a href="Applications.html">Applications</a></div>
+<div class="menu-item"><a href="datacode.html" class="current">Data&nbsp;&amp;&nbsp;Code</a></div>
+</td>
+<td id="layout-content">
+<div id="toptitle">
+<h1>Data &amp; Code</h1>
+</div>
+<p><b>Note:</b> this site is still under construction. In the near future we will provide the Matlab scripts that generate the figures and tables in the <a href="http://arxiv.org/abs/1301.2603">Robust Subspace Clustering</a> paper along with the <i>source data</i> required to run them. For now we have provided the code for the various solvers used in the paper.</p>
+<h2>Code</h2>
+<p><b>General guidelines:</b> The LASSO based solvers provided here use <a href="http://cvxr.com/tfocs/">TFOCS</a>. After downloading and saving the TFOCS path, please replace TFOCS's prox_l1.m with <a href="matlab/prox_l1.m">prox_l1.m</a>. The Dantzig based solvers use <a href="http://users.ece.gatech.edu/~sasif/homotopy/index.html">L1 Homotopy methods</a> tool box. The comparison files use <a href="http://cvxr.com/cvx/">CVX</a>. Please make sure to have these toolboxes installed/added to your Matlab path.</p>
+<h3>Complete Package</h3>
+<p>You can download all of the M-files provided on this webpage as a single zip file: <a href="RSC.zip">RSC.zip</a>.</p>
+<h3>Matlab solvers</h3>
+<h4>LASSO based solvers</h4>
+<ol>
+<li><p><b>RSC</b>: <br />
+Uses LASSO to simultaneously regress each column against all others with a single choice of <img class="eq" src="eqs/9213219682577124982-130.png" alt="lambda" style="vertical-align: -1px" /> for all data points.</p>
+<ol>
+<li><p>solver: <a href="matlab/solver_RSC.m">solver_RSC.m</a>.</p>
+</li>
+<li><p>comparison with CVX: <a href="matlab/run_RSC.m">run_RSC.m</a>.</p>
+</li></ol>
+</li>
+<li><p><b>partial RSC</b>:  <br />
+Uses LASSO to regress each column against all others with a single choice of <img class="eq" src="eqs/9213219682577124982-130.png" alt="lambda" style="vertical-align: -1px" /> for all data points. This process is carried out simultaneously over a partial subset of the data points.</p>
+<ol>
+<li><p>solver: <a href="matlab/solver_RSC_partial.m">solver_RSC_partial.m</a>.</p>
+</li>
+<li><p>comparison with CVX: <a href="matlab/run_RSC_partial.m">run_RSC_partial.m</a>.</p>
+</li></ol>
+</li>
+<li><p><b>multi-RSC</b>: <br />
+Uses LASSO to simultaneously regress each column against all others with a different choice of <img class="eq" src="eqs/9213219682577124982-130.png" alt="lambda" style="vertical-align: -1px" /> for each of the data points.</p>
+<ol>
+<li><p>solver: <a href="matlab/solver_multi_RSC.m">solver_multi_RSC.m</a>.</p>
+</li>
+<li><p>comparison with CVX: <a href="matlab/run_multi_RSC.m">run_multi_RSC.m</a>.</p>
+</li></ol>
+</li>
+<li><p><b>partial multi-RSC</b>: <br />
+Uses LASSO to regress each column against all others with a different choice of <img class="eq" src="eqs/9213219682577124982-130.png" alt="lambda" style="vertical-align: -1px" /> for each of the data points. This process is carried out simultaneously over a partial subset of the data points.</p>
+<ol>
+<li><p>solver: <a href="matlab/solver_multi_RSC_partial.m">solver_multi_RSC_partial.m</a>.</p>
+</li>
+<li><p>comparison with CVX: <a href="matlab/run_multi_RSC_partial.m">run_multi_RSC_partial.m</a>.</p>
+</li></ol>
+</li>
+<li><p><b>constrained RSC</b>: <br />
+Uses the constrained version of LASSO to simultaneously regress each column against all others with a single choice of <img class="eq" src="eqs/5161649540742415246-130.png" alt="tau" style="vertical-align: -1px" /> for each of the data points.</p>
+<ol>
+<li><p>solver: <a href="matlab/solver_constr_RSC.m">solver_constr_RSC.m</a>.</p>
+</li>
+<li><p>comparison with CVX: <a href="matlab/run_constr_RSC.m">run_constr_RSC.m</a>.</p>
+</li></ol>
+</li>
+<li><p><b>partial constrained RSC</b>: <br />
+Uses the constrained version of LASSO to regress each column against all others with a single choice of <img class="eq" src="eqs/5161649540742415246-130.png" alt="tau" style="vertical-align: -1px" /> for each of the data points. This process is carried out simultaneously over a partial subset of the data points.</p>
+<ol>
+<li><p>solver: <a href="matlab/solver_constr_RSC_partial.m">solver_constr_RSC_partial.m</a>.</p>
+</li>
+<li><p>comparison with CVX: <a href="matlab/run_constr_RSC_partial.m">run_constr_RSC_partial.m</a>.</p>
+</li>
+</ol>
+
+</li>
+</ol>
+<h4>Dantzig based solvers</h4>
+<ol>
+<li><p><b>Bias-corrected Dantzig:</b> <br />
+Solves the bias-corrected Dantzig formulation for each data point.</p>
+<ol>
+<li><p>solver: <a href="matlab/solver_BCDantzig.m">solver_BCDantzig.m</a></p>
+</li>
+<li><p>comparison with CVX: <a href="matlab/run_BCDantzig.m">run_BCDantzig.m</a></p>
+</li></ol>
+</li>
+<li><p><b>Bias-corrected Dantzig with multiple parameters:</b> <br />
+Solves the bias-corrected Dantzig formulation for each data point using multiple values of the parameter <img class="eq" src="eqs/9213219682577124982-130.png" alt="lambda" style="vertical-align: -1px" />.</p>
+<ol>
+<li><p>solver: <a href="matlab/solver_BCDantzig_all.m">solver_BCDantzig_all.m</a></p>
+</li>
+<li><p>comparison with CVX: <a href="matlab/run_BCDantzig_all.m">run_BCDantzig_all.m</a></p>
+</li>
+</ol>
+
+</li>
+</ol>
+<h3>Matlab functions</h3>
+<h4>op functions</h4>
+<p>These functions build the linear operators needed to simultaneously run all the regression problems in parallel for each of the solvers.</p>
+<ul>
+<li><p><a href="matlab/RSC_op.m">RSC_op.m</a></p>
+</li>
+<li><p><a href="matlab/RSC_op_partial.m">RSC_op_partial.m</a></p>
+</li>
+</ul>
+<h4>prox functions</h4>
+<ul>
+<li><p><a href="matlab/prox_col_l2.m">prox_col_l2.m</a>: builds prox function for <img class="eq" src="eqs/5074866107997946447-130.png" alt="ell_2/ell_{infty}" style="vertical-align: -5px" /> norm of a matrix. </p>
+</li>
+<li><p><a href="matlab/tfocs_prox.m">tfocs_prox.m</a>: builds prox functions (provided in <a href="http://cvxr.com/tfocs/">TFOCS</a>).</p>
+</li>
+<li><p><a href="matlab/prox_l1.m">prox_l1.m</a>: builds the prox of <img class="eq" src="eqs/2349274112114421517-130.png" alt="ell_1" style="vertical-align: -3px" /> norm (modified version of prox_l1.m provided in <a href="http://cvxr.com/tfocs/">TFOCS</a>).</p>
+</li>
+</ul>
+<h4>spectral clustering functions</h4>
+<ul>
+<li><p><a href="matlab/BuildAdjacency.m">BuildAdjacency.m</a>.</p>
+</li>
+<li><p><a href="matlab/Misclassification.m">Misclassification.m</a>.</p>
+</li>
+<li><p><a href="matlab/missclassGroups.m">missclassGroups.m</a>.</p>
+</li>
+<li><p><a href="matlab/SpectralClustering.m">SpectralClustering.m</a>.</p>
+</li>
+</ul>
+<h3>Matlab scripts</h3>
+<ul>
+<li><p>coming soon!</p>
+</li>
+</ul>
+<h2>Data</h2>
+<ul>
+<li><p>coming soon!</p>
+</li>
+</ul>
+<div id="footer">
+<div id="footer-text">
+Page generated 2013-06-13 13:59:38 PDT, by <a href="http://jemdoc.jaboc.net/">jemdoc</a>.
+</div>
+</div>
+</td>
+</tr>
+</table>
+</body>
+</html>
